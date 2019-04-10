@@ -115,12 +115,6 @@ export default {
 
     userId() {
       return parseInt(localStorage.getItem(USER_ID));
-    },
-
-    picksOpen() {
-      if (this.currentTournament) {
-        return checkIfPicksOpen(this.currentTournament);
-      }
     }
   },
 
