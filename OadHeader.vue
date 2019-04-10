@@ -25,10 +25,12 @@
 export default {
   props: {
     teams: {
-      type: Array
+      type: Array,
+      required: true
     },
     activeEntry: {
-      type: Object
+      type: Object,
+      required: true
     }
   },
 

@@ -66,18 +66,17 @@
   </section>
 </template>
 <script>
-import { USER_ID } from "../../constants/settings";
+import { USER_ID } from "@constants/settings";
 import { mapMutations, mapGetters } from "vuex";
-import { checkIfPicksOpen } from "../../helpers.js";
-import GOLFERS_ALL from "../../graphql/GolfersAll.gql";
-import TOURNAMENT_GOLFERS from "../../graphql/TournamentGolfersQuery.gql";
-import TOURNAMENTS from "../../graphql/TournamentsAll.gql";
-import USER_PICKS from "../../graphql/UserPgaPicksAll.gql";
-import PickForm from "../../components/OadPickItem";
-import GolfCart from "../../global/GolfCartAnimation";
-import LoginModal from "../../modals/LoginModal";
-import OadHeader from "../../components/OadHeader";
-import OadPicksRoundup from "../../components/OadPicksRoundup";
+import GOLFERS_ALL from "@graphql/GolfersAll.gql";
+import TOURNAMENT_GOLFERS from "@graphql/TournamentGolfersQuery.gql";
+import TOURNAMENTS from "@graphql/TournamentsAll.gql";
+import USER_PICKS from "@graphql/UserPgaPicksAll.gql";
+import PickForm from "@components/OadPickItem";
+import GolfCart from "@global/GolfCartAnimation";
+import LoginModal from "@modals/LoginModal";
+import OadHeader from "@components/OadHeader";
+import OadPicksRoundup from "@components/OadPicksRoundup";
 
 export default {
   components: { PickForm, GolfCart, LoginModal, OadHeader, OadPicksRoundup },
@@ -101,7 +100,7 @@ export default {
   },
 
   created() {
-    if (this.tournaments.length == 0) {
+    if (this.tournaments.length === 0) {
       this.triggerTourQuery();
     }
 
@@ -123,11 +122,6 @@ export default {
       this.triggerTourGolferQuery();
     },
 
-    activeEntry() {
-      this.setGolfersList();
-      this.setUsedGolfersList();
-    },
-
     golfers() {
       if (this.userPgaPicks && this.golfers) {
         this.setUsedGolfersList();
@@ -135,13 +129,7 @@ export default {
     },
 
     showLoginModal() {
-      let body = document.getElementsByTagName("body")[0];
-
-      if (this.showLoginModal) {
-        body.style.overflowY = "hidden";
-      } else {
-        body.style.overflowY = "auto";
-      }
+      document.body.style.overflowY = this.showLoginModal ? "hidden" : "auto";
     }
   },
 
@@ -158,12 +146,13 @@ export default {
     },
 
     setGolfersList() {
-      // clear out used golfers
+      // Revisting parsing out to a computed property instead of method
+      // clear out used golfers for new active entry
       this.golfersList = [];
 
       this.tournamentGolfers.forEach((golfer, i) => {
         const usedGolfer = this.userPgaPicks.find(pick => {
-          return pick.tournament_golfer_id == golfer.id && pick.tournament_id != this.currentTournament.id && pick.entry_id == this.activeEntry.entry_id;
+          return pick.tournament_golfer_id === golfer.id && pick.tournament_id != this.currentTournament.id && pick.entry_id === this.activeEntry.entry_id;
         });
 
         if (!usedGolfer) {
@@ -172,19 +161,20 @@ export default {
           this.golfersList.push(newGolfer);
         }
 
-        if (i + 1 == this.tournamentGolfers.length) {
+        if (i + 1 === this.tournamentGolfers.length) {
           this.golfersReady = true;
         }
       });
     },
 
     setUsedGolfersList() {
+      // Revisting parsing out to a computed property instead of method
       this.usedGolfersList = [];
 
       this.userPgaPicks.forEach(pick => {
-        if (pick.entry_id == this.activeEntry.entry_id) {
+        if (pick.entry_id === this.activeEntry.entry_id) {
           let golfer = this.golfers.find(g => {
-            return g.id == pick.tournament_golfer_id && pick.tournament_id != this.currentTournament.id;
+            return g.id === pick.tournament_golfer_id && pick.tournament_id != this.currentTournament.id;
           });
 
           if (golfer) {
@@ -198,7 +188,7 @@ export default {
       this.currentWeekPicks = [];
 
       data.userPgaPicks.forEach(pick => {
-        if (pick.tournament_id == this.currentTournament.id) {
+        if (pick.tournament_id === this.currentTournament.id) {
           let curPick = JSON.parse(JSON.stringify(pick));
 
           if (!curPick.tournament_golfer_id) {
@@ -213,13 +203,15 @@ export default {
         }
       });
     },
-
+  // update to triple equals
+  // update setUsedGolfers
+  // update setGolfersList to computed
     setTeams(data) {
-      if (this.teams.length == 0) {
+      if (this.teams.length === 0) {
         const pickArr = data.userPgaPicks.slice(0, 3);
 
         pickArr.forEach((pick, i) => {
-          if (i == 0) {
+          if (i === 0) {
             const team = {
               entry_id: pick.entry_id,
               teamname: pick.teamname
@@ -228,7 +220,7 @@ export default {
             this.teams.push(team);
           } else {
             const setTeam = this.teams.find(team => {
-              return team.teamname == pick.teamname;
+              return team.teamname === pick.teamname;
             });
             if (!setTeam) {
               const team = {
@@ -240,7 +232,7 @@ export default {
             }
           }
 
-          if (i + 1 == pickArr.length) {
+          if (i + 1 === pickArr.length) {
             this.activeEntry = this.teams[0];
             this.activeIndex = 0;
           }
